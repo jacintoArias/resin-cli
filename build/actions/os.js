@@ -121,9 +121,9 @@ exports.download = {
 };
 
 exports.configure = {
-  signature: 'os configure <image> <uuid>',
+  signature: 'os configure <image> <uuid> [deviceApiKey]',
   description: 'configure an os image',
-  help: 'Use this command to configure a previously download operating system image with a device.\n\nExamples:\n\n	$ resin os configure ../path/rpi.img 7cf02a6',
+  help: 'Use this command to configure a previously download operating system image with a device.\n\nExamples:\n\n	$ resin os configure ../path/rpi.img 7cf02a6\n	$ resin os configure ../path/rpi.img 7cf02a6 existingDeviceKey',
   permission: 'user',
   options: [
     {
@@ -157,7 +157,10 @@ exports.configure = {
           override: override
         });
       }).then(function(answers) {
-        return init.configure(params.image, params.uuid, answers).then(helpers.osProgressHandler);
+        var ref;
+        return Promise.resolve((ref = params.deviceApiKey) != null ? ref : resin.models.device.generateDeviceKey(params.uuid)).then(function(deviceApiKey) {
+          return init.configure(params.image, params.uuid, deviceApiKey, answers).then(helpers.osProgressHandler);
+        });
       });
     }).nodeify(done);
   }

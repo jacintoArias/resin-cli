@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- Added a device api key parameter to the `os configure` command. Check `resin help os configure` for details.
 - Added a `--device-api-key` option to the `config generate` command. Check `resin help config generate` for details.
 - Added a `--device-api-key` option to the `device register` command. Check `resin help device register` for details.
 - Add uploading of build logs when present with resin deploy

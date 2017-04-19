@@ -134,7 +134,7 @@ exports.download =
 		.nodeify(done)
 
 exports.configure =
-	signature: 'os configure <image> <uuid>'
+	signature: 'os configure <image> <uuid> [deviceApiKey]'
 	description: 'configure an os image'
 	help: '''
 		Use this command to configure a previously download operating system image with a device.
@@ -142,6 +142,7 @@ exports.configure =
 		Examples:
 
 			$ resin os configure ../path/rpi.img 7cf02a6
+			$ resin os configure ../path/rpi.img 7cf02a6 existingDeviceKey
 	'''
 	permission: 'user'
 	options: [
@@ -158,7 +159,8 @@ exports.configure =
 		helpers = require('../utils/helpers')
 
 		console.info('Configuring operating system image')
-		resin.models.device.get(params.uuid).then (device) ->
+		resin.models.device.get(params.uuid)
+		.then (device) ->
 			helpers.getManifest(params.image, device.device_type)
 			.get('options')
 			.then (questions) ->
@@ -173,7 +175,10 @@ exports.configure =
 
 				return form.run(questions, { override })
 			.then (answers) ->
-				init.configure(params.image, params.uuid, answers).then(helpers.osProgressHandler)
+				Promise.resolve(params.deviceApiKey ? resin.models.device.generateDeviceKey(params.uuid))
+				.then (deviceApiKey) ->
+					init.configure(params.image, params.uuid, deviceApiKey, answers)
+		.then(helpers.osProgressHandler)
 		.nodeify(done)
 
 initWarningMessage = '''
