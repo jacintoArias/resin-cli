@@ -83,7 +83,7 @@ exports.supported = {
 exports.register = {
   signature: 'device register <application>',
   description: 'register a device',
-  help: 'Use this command to register a device to an application.\n\nExamples:\n\n	$ resin device register MyApp',
+  help: 'Use this command to register a device to an application.\n\nExamples:\n\n	$ resin device register MyApp\n	$ resin device register MyApp --uuid 83cb718aee3abe63d2e0a0016ea49399cdc5b3f9b879dbb01acf73f28f5085\n	$ resin device register MyApp --uuid 83cb718aee3abe63d2e0a0016ea49399cdc5b3f9b879dbb01acf73f28f5085 --device-api-key existingDeviceKey',
   permission: 'user',
   options: [
     {
@@ -91,19 +91,25 @@ exports.register = {
       description: 'custom uuid',
       parameter: 'uuid',
       alias: 'u'
+    }, {
+      signature: 'deviceApiKey',
+      description: 'custom device key',
+      parameter: 'device-api-key',
+      alias: 'k'
     }
   ],
   action: function(params, options, done) {
-    var Promise, resin;
+    var Promise, ref, resin;
     Promise = require('bluebird');
     resin = require('resin-sdk-preconfigured');
-    return resin.models.application.get(params.application).then(function(application) {
-      return Promise["try"](function() {
-        return options.uuid || resin.models.device.generateUniqueKey();
-      }).then(function(uuid) {
-        console.info("Registering to " + application.app_name + ": " + uuid);
-        return resin.models.device.register(application.app_name, uuid);
-      });
+    return Promise.join(resin.models.application.get(params.application), options.uuid || resin.models.device.generateUniqueKey(), (ref = options.deviceApiKey) != null ? ref : resin.models.device.generateUniqueKey(), function(application, uuid, deviceApiKey) {
+      console.info("Registering to " + application.app_name + ": " + uuid);
+      if (options.deviceApiKey == null) {
+        console.info("Using generated device api key: " + deviceApiKey);
+      } else {
+        console.info('Using provided device api key');
+      }
+      return resin.models.device.register(application.app_name, uuid, deviceApiKey);
     }).get('uuid').nodeify(done);
   }
 };
