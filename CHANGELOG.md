@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Ensure emulated builds use the correct relative path to qemu when called from any location
+- Fix issue when using resin deploy with non-standard stdin (e.g. git bash on windows)
 
 ## [5.10.2] - 2017-05-31
 
