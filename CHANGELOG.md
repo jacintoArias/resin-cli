@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+### Added
+
+- Do not explicitly disable ControlMaster option for device SSH connections
+
 ## [5.11.0] - 2017-06-19
 
 ### Added
